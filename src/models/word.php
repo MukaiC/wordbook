@@ -10,6 +10,7 @@ class WordModel extends Model{
       // $this->bind(':keyword', '%'.$search.'%');
       // $rows = $this->resultSet();
       // // print_r($rows);
+      // print_r($_POST);
       $rows = $this->search();
       // return $rows;
 
@@ -62,10 +63,23 @@ class WordModel extends Model{
 
   public function search(){
     $post = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
-    // Search word in entry and meaning collums
-    $this->query('SELECT * FROM words WHERE user_id = :user_id AND (entry LIKE :keyword OR meaning LIKE :keyword)');
-    // Alternative to the above query
-    // $this->query('SELECT * FROM words WHERE user_id = :user_id AND entry LIKE :keyword UNION SELECT * FROM words WHERE user_id = :user_id AND meaning LIKE :keyword');
+    // // Search word in entry and meaning collums
+    // $this->query('SELECT * FROM words WHERE user_id = :user_id AND (entry LIKE :keyword OR meaning LIKE :keyword)');
+    // // Alternative to the above query
+    // // $this->query('SELECT * FROM words WHERE user_id = :user_id AND entry LIKE :keyword UNION SELECT * FROM words WHERE user_id = :user_id AND meaning LIKE :keyword');
+
+    // If the value of $post['submit'] == 'meaning';
+    if($post['submit'] == 'Search meaning'){
+      $this->query('SELECT * FROM words WHERE user_id = :user_id AND meaning LIKE :keyword');
+      // echo 'searching meaning';
+    } elseif($post['submit'] == 'Search notes'){
+      $this->query('SELECT * FROM words WHERE user_id = :user_id AND notes LIKE :keyword');
+      // echo 'searching notes';
+    } else {
+      $this->query('SELECT * FROM words WHERE user_id = :user_id AND entry LIKE :keyword');
+      // echo 'searching entry';
+    }
+
     $search = $post['keyword'];
     $this->bind(':user_id', $_SESSION['user_data']['id']);
     $this->bind(':keyword', '%'.$search.'%');
