@@ -17,9 +17,11 @@ require 'classes/Model.php';
 require 'controllers/home.php';
 require 'controllers/users.php';
 require 'controllers/words.php';
+require 'controllers/quizzes.php';
 require 'models/home.php';
 require 'models/user.php';
 require 'models/word.php';
+require 'models/quiz.php';
 
 $bootstrap = new Bootstrap($_GET);
 $controller = $bootstrap->createController();
