@@ -40,6 +40,15 @@ abstract class Model{
     return $this->stmt->fetchAll(PDO::FETCH_ASSOC);
   }
 
+  public function resultSetAll(){
+    $this->execute();
+    return $this->stmt->fetchAll();
+  }
+  public function resultSetGroup(){
+    $this->execute();
+    return $this->stmt->fetchAll(PDO::FETCH_GROUP);
+  }
+
   public function single(){
     $this->stmt->execute();
     return $this->stmt->fetch(PDO::FETCH_ASSOC);

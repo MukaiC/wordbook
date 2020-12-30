@@ -24,6 +24,9 @@
         <li class="nav-item active">
           <a class="nav-link" href="<?php echo ROOT_URL; ?>words">My WordBook</a>
         </li>
+        <li class="nav-item active">
+          <a class="nav-link" href="<?php echo ROOT_URL; ?>quizzes">Quizzes</a>
+        </li>
       </ul>
 
       <ul class="navbar-nav navbar-right mr-auto">
