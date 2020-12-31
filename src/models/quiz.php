@@ -33,7 +33,8 @@ class QuizModel extends Model{
         // Insert question into MySQL
         $this->query('INSERT INTO questions (content, user_id) VALUES (:content, :user_id)');
         $this->bind(':content', $post['question']);
-        $this->bind(':user_id', 1);
+        // Get the loggedin user's id from $_SESSION[user_data] and bind it
+        $this->bind(':user_id', $_SESSION['user_data']['id']);
         $this ->execute();
         if($this->lastInsertId()){
           $question_id = $this->lastInsertId();
@@ -118,7 +119,6 @@ class QuizModel extends Model{
 
       } else {
 
-        // echo 'take a quiz';
         // Retrieve the quiz from database
         // $this->query('SELECT * FROM questions JOIN options ON options.question_id = questions.id WHERE question_id = 3');
 
@@ -126,7 +126,11 @@ class QuizModel extends Model{
         // $this->query('SELECT questions.content, options.content, options.is_answer FROM questions INNER JOIN users ON questions.user_id = users.id WHERE users.id = 1 INNER JOIN options ON options.question_id = questions.id' );
         // $this->query('SELECT questions.* FROM questions JOIN users ON questions.user_id = user.id' );
 
-        $this->query('SELECT questions.content, options.content, options.is_answer FROM questions JOIN users ON questions.user_id = users.id JOIN options ON options.question_id = questions.id');
+        $this->query('SELECT questions.content, options.content, options.is_answer FROM questions JOIN users ON questions.user_id = users.id JOIN options ON options.question_id = questions.id WHERE users.id = :user_id');
+
+        // Bind the user_id to the current user id
+        $userId = $_SESSION['user_data']['id'];
+        $this->bind(':user_id', $userId);
 
         // $this->query('SELECT questions.content, options.content, options.is_answer FROM questions INNER JOIN options ON questions.id = options.question_id WHERE questions.id = 3' );
 
@@ -142,6 +146,8 @@ class QuizModel extends Model{
         // Store $row in session to check the answer once it is submitted
         if($rows){
           $_SESSION['quiz_data'] = $rows;
+        } else {
+          Messages::setMsg('No quizzes yet', 'error');
         }
 
         return $rows;
