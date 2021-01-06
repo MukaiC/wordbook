@@ -22,11 +22,11 @@
   <div class="container mt-4">
 
     <?php if(!$viewmodel) : ?>
-      <h5><?php echo 'No entries yet.<br> Add new words or phrases!' ?></h5>
+      <p><?php echo 'No entries yet.<br> Add new words or phrases!' ?></p>
     <?php else: ?>
       <?php foreach($viewmodel as $item) : ?>
         <div class="card card-body border-info mb-2 bg-light">
-          <h4><?php echo $item['entry']; ?></h4>
+          <strong><?php echo $item['entry']; ?></strong>
           <p><?php echo $item['meaning'] ?></p><hr>
           <?php if($item['notes'] !== '') : ?>
           <p><?php echo $item['notes']; ?></p>

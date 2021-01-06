@@ -13,6 +13,7 @@ class Users extends Controller{
   protected function logout(){
     unset($_SESSION['is_logged_in']);
     unset($_SESSION['user_data']);
+    unset($_SESSION['next']);
     session_destroy();
     // Redirect
     header('Location: '.ROOT_URL);

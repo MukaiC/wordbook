@@ -9,6 +9,11 @@ class Quizzes extends Controller{
   }
 
   protected function create(){
+    // Make sure the user is logged in
+    if(!isset($_SESSION['is_logged_in'])){
+      $_SESSION['next'] = 'quizzes/create';
+      header('Location: '.ROOT_URL.'users/login');
+    }
     $viewmodel = new QuizModel();
     $this->returnView($viewmodel->create(), true);
   }

@@ -1,20 +1,13 @@
 <?php
 class QuizModel extends Model{
   public function Index(){
-
-    if(isset($_POST['submit'])){
-      $post = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
-      if($post['q1'] == 'ばら'){
-        Messages::setMsg('Correct!', 'success');
-        // echo 'Correct!';
-      } else {
-        Messages::setMsg('Incorrect', 'error');
-        // echo 'Incorrect';
-      }
-    } else {
-      echo 'Quizzes/index from model';
-    }
-      return;
+    // !! Retrieve the title and the user's name of all quizzes to list on index page
+    $this->query('SELECT quizzes.*, users.name FROM quizzes JOIN users ON quizzes.user_id = users.id ORDER BY created_at DESC');
+    $rows = $this->resultSet();
+    // echo '<pre>';
+    // print_r($rows);
+    // echo '</pre>';
+    return $rows;
     }
 
   public function create(){
@@ -87,21 +80,29 @@ class QuizModel extends Model{
 
   public function take(){
     /*This is for a quizz page where questions are displayed one at a time*/
-    // Retrieve the quiz data
-    $this->query('SELECT questions.content, options.content, options.is_answer FROM questions JOIN users ON questions.user_id = users.id JOIN options ON options.question_id = questions.id WHERE users.id = :user_id');
-    // Bind the user_id to the current user id
-    $userId = $_SESSION['user_data']['id'];
-    $this->bind(':user_id', $userId);
-    // Query results
-    $rows = $this->resultSetGroup();
-    // Store the data in session
-    if($rows){
-      $_SESSION['quiz_data'] = $rows;
+    // Id of the selected quiz
+    if(isset($_GET['id'])){
+      $quiz_id = intval($_GET['id']);
+      // echo $quiz_id;
     } else {
-      Messages::setMsg('No quizzes yet', 'error');
+      Messages::setMsg('Quiz not found', 'error');
+      // Redirect
+      header('Location: '.ROOT_URL.'quizzes');
     }
-    return $rows;
+    // Retrieve the quiz
+    $this->query('SELECT questions.content, options.content, options.is_answer FROM quizzes JOIN questions ON questions.quiz_id = quizzes.id JOIN options ON options.question_id = questions.id WHERE quizzes.id = :quiz_id');
+    $this-> bind(':quiz_id', $quiz_id);
+    $rows = $this->resultSetGroup();
+    // echo '<pre>';
+    // print_r($rows);
+    // echo '</pre>';
+    if(!$rows){
+       Messages::setMsg('No quizzes yet', 'error');
+    } else {
+      return $rows;
     }
+    // return $rows;
+  }
 
 
   public function takeAll(){

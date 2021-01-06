@@ -46,7 +46,13 @@ class UserModel extends Model{
           'email'=>$row['email']
         );
         // Redirect
-        header('Location: '.ROOT_URL.'words');
+        if(isset($_SESSION['next'])){
+          header('Location: '.ROOT_URL.$_SESSION['next']);
+          
+        } else{
+          header('Location: '.ROOT_URL.'words');
+        }
+
       } else {
         Messages::setMsg('Incorrect Login', 'error');
       }
