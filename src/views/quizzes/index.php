@@ -1,3 +1,4 @@
+
 <div class="container mb-5">
 <h1>QUIZZES</h1><hr><br>
   <div class="container mb-3">
@@ -9,6 +10,8 @@
     <h2>Create New Quiz</h2>
       <a class="btn btn-outline-info" href="<?php echo ROOT_PATH; ?>quizzes/create">Create Quiz</a>
   </div>
+
+
 
 
   <!-- <form class="form-check" action="<?php /*$_SERVER['PHP_SELF']; */?>" method="post">

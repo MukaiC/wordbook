@@ -17,7 +17,7 @@ class QuizModel extends Model{
       return;
     }
 
-    public function create(){
+  public function create(){
       // echo 'from models/quiz/create';
       $post = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
       if(isset($post['submit'])){
@@ -30,15 +30,33 @@ class QuizModel extends Model{
           return;
         }
 
-        // Insert question into MySQL
-        $this->query('INSERT INTO questions (content, user_id) VALUES (:content, :user_id)');
-        $this->bind(':content', $post['question']);
+        // Insert user_id and title to table quizzes
+        $this->query('INSERT INTO quizzes (user_id, title) VALUES (:user_id, :title)');
         // Get the loggedin user's id from $_SESSION[user_data] and bind it
         $this->bind(':user_id', $_SESSION['user_data']['id']);
+        $this->bind(':title', $post['title']);
+        $this->execute();
+        // Get the lastinserted id for this quiz
+        $quiz_id = $this->lastInsertId();
+
+        // Insert question into MySQL
+        $this->query('INSERT INTO questions (content, quiz_id, user_id) VALUES (:content, :quiz_id, :user_id)');
+        $this->bind(':content', $post['question']);
+        $this->bind(':quiz_id', $quiz_id);
+        $this->bind(':user_id', $_SESSION['user_data']['id']);
         $this ->execute();
-        if($this->lastInsertId()){
-          $question_id = $this->lastInsertId();
-        }
+        // echo 'executed';
+        // get the lastinserted id for this questions's options
+        $question_id = $this->lastInsertId();
+        // echo $question_id;
+        // die;
+        // if($this->lastInsertId()){
+        //   $question_id = $this->lastInsertId();
+        //   echo $question_id;
+        // } else {
+        //   echo 'no question_id';
+        //   die;
+        // }
 
         // 　Loop through the options 1-4 and insert them into MySQL
         for($i = 1; $i < 5; $i++){
@@ -65,7 +83,29 @@ class QuizModel extends Model{
       return;
     }
 
-    public function take(){
+
+
+  public function take(){
+    /*This is for a quizz page where questions are displayed one at a time*/
+    // Retrieve the quiz data
+    $this->query('SELECT questions.content, options.content, options.is_answer FROM questions JOIN users ON questions.user_id = users.id JOIN options ON options.question_id = questions.id WHERE users.id = :user_id');
+    // Bind the user_id to the current user id
+    $userId = $_SESSION['user_data']['id'];
+    $this->bind(':user_id', $userId);
+    // Query results
+    $rows = $this->resultSetGroup();
+    // Store the data in session
+    if($rows){
+      $_SESSION['quiz_data'] = $rows;
+    } else {
+      Messages::setMsg('No quizzes yet', 'error');
+    }
+    return $rows;
+    }
+
+
+  public function takeAll(){
+    // This is for a quizz where all questions are displayed at onece
       if(isset($_POST['submit'])){
         $post = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
           var_dump($post);
@@ -138,10 +178,10 @@ class QuizModel extends Model{
 
         // $rows = $this->resultSetGroup();
         $rows = $this->resultSetGroup();
-        echo '<pre>';
-        print_r($rows);
-        echo '</pre>';
-        var_dump($rows);
+        // echo '<pre>';
+        // print_r($rows);
+        // echo '</pre>';
+        // var_dump($rows);
         // print_r($rows);
         // Store $row in session to check the answer once it is submitted
         if($rows){
@@ -154,4 +194,6 @@ class QuizModel extends Model{
       }
 
     }
+
+
   }

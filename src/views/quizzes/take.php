@@ -1,30 +1,29 @@
-<div class="container mt-5">
+
 
 <?php if($viewmodel): ?>
-<form class="form-check" action="<?php $_SERVER['PHP_SELF']; ?>" method="post">
-<?php if(isset($viewmodel)): ?>
-  <!-- Keep track of the question number -->
-  <?php $q_num=0; ?>
-  <?php foreach($viewmodel as $key => $value): ?>
-    <strong><?php echo $key; ?></strong><br><br>
-    <?php $i=0; ?>
-    <?php foreach($value as $item): ?>
+<!-- Store the quizz data in JS variable -->
+<!-- create JSON array of questions -->
+<?php $questions = json_encode (array_keys($viewmodel), JSON_UNESCAPED_UNICODE); ?>
+<!-- encode quiz data to JSON format -->
+<?php $quizData = json_encode($viewmodel, JSON_UNESCAPED_UNICODE); ?>
+<?php /*echo $quizData;*/ ?>
 
-      <input type="radio" name="choice<?php echo $q_num; ?>" value="<?php echo $i;?>" checked="checked"><?php echo $item[0]; ?><br>
-      <?php $i++; ?>
-    <?php endforeach; ?><br><br>
-    <?php $q_num++; ?>
-  <?php endforeach; ?>
-<br>
+<script type="text/javascript">
+  // pass questions and quizData to javascript
+  var questions = <?php echo $questions; ?>;
+  var quizData = <?php echo $quizData; ?>;
 
-<input class="btn btn-outline-primary" type="submit" name="submit" value="Submit">
-<?php endif; ?>
-<?php else: ?>
-  <div class="container mt-5">
-
-    <a href="<?php echo ROOT_PATH; ?>quizzes/create">Create a Quiz?</a>
+</script>
+<form class="container mb-3" id="form">
+  <h1 id="question"></h1><hr><br>
+  <div id="choices">
   </div>
 
-<?php endif; ?>
+  <input class="btn btn-outline-primary" id="submit" type="submit" name="submit" value="Submit">
+
 </form>
-</div>
+
+
+
+<script type="text/javascript" src="<?php echo ROOT_URL; ?>assets/JS/quiz.js"></script>
+<?php endif; ?>

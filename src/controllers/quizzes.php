@@ -17,4 +17,9 @@ class Quizzes extends Controller{
     $viewmodel = new QuizModel();
     $this->returnView($viewmodel->take(), true);
   }
+
+  protected function takeAll(){
+    $viewmodel = new QuizModel();
+    $this->returnView($viewmodel->takeAll(), true);
+  }
 }
