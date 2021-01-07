@@ -1,28 +1,46 @@
 <?php
 class QuizModel extends Model{
   public function Index(){
-    // !! Retrieve the title and the user's name of all quizzes to list on index page
+    // Retrieve the title and the user's name of all quizzes to list on index page
     $this->query('SELECT quizzes.*, users.name FROM quizzes JOIN users ON quizzes.user_id = users.id ORDER BY created_at DESC');
     $rows = $this->resultSet();
-    // echo '<pre>';
-    // print_r($rows);
-    // echo '</pre>';
     return $rows;
     }
 
   public function create(){
-      // echo 'from models/quiz/create';
-      $post = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
-      if(isset($post['submit'])){
-        if($post['question'] == '' || $post['option1'] == '' || $post['option2'] =='' || $post['option3'] == '' || $post['option4'] ==''){
-          Messages::setMsg('Please Fill In all Fields', 'error');
-          return;
-        }
-        elseif(empty($post['correct'])){
-          Messages::setMsg('Please choose the correct answer', 'error');
-          return;
-        }
+    $post = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+    // Cancel button is pressed
+    if(isset($post['cancel'])){
+      if(isset($_SESSION['create_data'])){
+        // Delete the quiz
+        $this->query('DELETE FROM quizzes WHERE quizzes.id = :quiz_id');
+        $this->bind(':quiz_id', $_SESSION['create_data']['quiz_id']);
+        $this->execute();
+        // Clear create_data
+        unset($_SESSION['create_data']);
+        // Redirect to quizzes index
+        header('Location: '.ROOT_URL.'quizzes/index');
+        exit;
+      } else {
+        // Redirect to quizzes index
+        header('Location: '.ROOT_URL.'quizzes/index');
+        exit;
+      }
+    }
+    // Form is submitted
+    if(isset($post['submit']) || isset($post['submit-last'])){
+      // Make sure all fields are filled
+      if($post['question'] == '' || $post['option1'] == '' || $post['option2'] =='' || $post['option3'] == '' || $post['option4'] ==''){
+        Messages::setMsg('Please Fill In all Fields', 'error');
+        return;
+      } elseif(empty($post['correct'])){
+        Messages::setMsg('Please choose the correct answer', 'error');
+        return;
+      }
 
+      // First question
+      if(!isset($_SESSION['create_data'])){
+        // First question of a new quiz
         // Insert user_id and title to table quizzes
         $this->query('INSERT INTO quizzes (user_id, title) VALUES (:user_id, :title)');
         // Get the loggedin user's id from $_SESSION[user_data] and bind it
@@ -38,20 +56,10 @@ class QuizModel extends Model{
         $this->bind(':quiz_id', $quiz_id);
         $this->bind(':user_id', $_SESSION['user_data']['id']);
         $this ->execute();
-        // echo 'executed';
-        // get the lastinserted id for this questions's options
+        // Get the lastinserted id for this questions's options
         $question_id = $this->lastInsertId();
-        // echo $question_id;
-        // die;
-        // if($this->lastInsertId()){
-        //   $question_id = $this->lastInsertId();
-        //   echo $question_id;
-        // } else {
-        //   echo 'no question_id';
-        //   die;
-        // }
 
-        // 　Loop through the options 1-4 and insert them into MySQL
+        // Loop through the options 1-4 and insert them into MySQL
         for($i = 1; $i < 5; $i++){
           $this->query('INSERT INTO options (question_id, content, is_answer) VALUES (:question_id, :content, :is_answer)');
           $this->bind(':question_id', $question_id);
@@ -63,19 +71,65 @@ class QuizModel extends Model{
           }
           $this->execute();
         }
-
         if($this->lastInsertId()){
-          header('Location: '.ROOT_URL.'quizzes');
+          // Store quiz_id in session data
+          $_SESSION['create_data'] = array (
+            'quiz_id' => $quiz_id,
+            'title' => $post['title'],
+            'num_question' => 1
+          );
+          // stay on the same page
+          // return;
+          header('Location: '.ROOT_URL.'quizzes/create');
+          exit;
         }
 
-        // echo '<pre>';
-        // print_r($post);
-        // echo '</pre>';
-        // var_dump($post);
+      } else {
+        // Not first question
+        $quiz_title = $_SESSION['create_data']['title'];
+        $quiz_id = $_SESSION['create_data']['quiz_id'];
+        // Insert question with the same quiz_id
+        $this->query('INSERT INTO questions (content, quiz_id, user_id) VALUES (:content, :quiz_id, :user_id)');
+        $this->bind(':content', $post['question']);
+        $this->bind(':quiz_id', $quiz_id);
+        $this->bind(':user_id', $_SESSION['user_data']['id']);
+        $this ->execute();
+        // get the lastinserted id for this questions's options
+        $question_id = $this->lastInsertId();
+        // insert answer choices
+        for($i = 1; $i < 5; $i++){
+          $this->query('INSERT INTO options (question_id, content, is_answer) VALUES (:question_id, :content, :is_answer)');
+          $this->bind(':question_id', $question_id);
+          $this->bind(':content', $post["option{$i}"]);
+          if($post['correct'] == "{$i}"){
+            $this->bind(':is_answer', true);
+          } else {
+            $this->bind(':is_answer', false);
+          }
+          $this->execute();
+        }
+        // Answer options successfully inserted
+        if($this->lastInsertId()){
+          // Increment num_question in session
+          $_SESSION['create_data']['num_question']++;
+          // In case of the last question
+          if(isset($post['submit-last'])){
+            // clear create_data
+            unset($_SESSION['create_data']);
+            // redirect to quizzes index
+            header('Location: '.ROOT_URL.'quizzes/index');
+            exit;
+          } else {
+            // redirect to create page for next question
+            header('Location: '.ROOT_URL.'quizzes/create');
+            exit;
+            // return;
+          }
+        }
       }
-      return;
     }
-
+    return;
+  }
 
 
   public function take(){
@@ -104,12 +158,11 @@ class QuizModel extends Model{
     // return $rows;
   }
 
-
+  // This is to display a quizz with all questions at onece
   public function takeAll(){
-    // This is for a quizz where all questions are displayed at onece
       if(isset($_POST['submit'])){
         $post = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
-          var_dump($post);
+          // var_dump($post);
           // Messages::setMsg('Answer is submitted', 'success');
           // Check if the answer is correct
           // echo 'session data:';
@@ -138,46 +191,14 @@ class QuizModel extends Model{
               $question++;
             }
           }
-
           Messages::setMsg("You scored {$score} out of {$num_q}", 'success');
-
-          // // var_dump ($_SESSION['quiz_data']);
-          // // $choice = intval($post['choice']);
-          // // $is_correct = $_SESSION['quiz_data']['春'][$choice]['is_answer'];
-          // // Check the 'is_answer' value for the chosen option
-          // $indexed_array = array_values($_SESSION['quiz_data']);
-          // $is_answer = array_values($_SESSION['quiz_data']) [0][$choice]['is_answer'];
-          //
-          // if($is_answer == 1){
-          //   Messages::setMsg('Correct!', 'success');
-          // } else {
-          //   Messages::setMsg('Wrong!', 'error');
-          // }
-          // echo $is_correct;
-          // echo 'INDEXED';
-          // var_dump($indexed_array);
           return;
-
       } else {
-
         // Retrieve the quiz from database
-        // $this->query('SELECT * FROM questions JOIN options ON options.question_id = questions.id WHERE question_id = 3');
-
-        // Retrieve questions and answer options created by the user whose ID is 1
-        // $this->query('SELECT questions.content, options.content, options.is_answer FROM questions INNER JOIN users ON questions.user_id = users.id WHERE users.id = 1 INNER JOIN options ON options.question_id = questions.id' );
-        // $this->query('SELECT questions.* FROM questions JOIN users ON questions.user_id = user.id' );
-
         $this->query('SELECT questions.content, options.content, options.is_answer FROM questions JOIN users ON questions.user_id = users.id JOIN options ON options.question_id = questions.id WHERE users.id = :user_id');
-
         // Bind the user_id to the current user id
         $userId = $_SESSION['user_data']['id'];
         $this->bind(':user_id', $userId);
-
-        // $this->query('SELECT questions.content, options.content, options.is_answer FROM questions INNER JOIN options ON questions.id = options.question_id WHERE questions.id = 3' );
-
-        // $this->query('SELECT * FROM questions WHERE id = 3');
-
-        // $rows = $this->resultSetGroup();
         $rows = $this->resultSetGroup();
         // echo '<pre>';
         // print_r($rows);
@@ -190,11 +211,7 @@ class QuizModel extends Model{
         } else {
           Messages::setMsg('No quizzes yet', 'error');
         }
-
         return $rows;
       }
-
     }
-
-
   }

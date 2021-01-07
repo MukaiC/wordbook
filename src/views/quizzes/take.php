@@ -18,12 +18,8 @@
   <h1 id="question"></h1><hr><br>
   <div id="choices">
   </div>
-
   <input class="btn btn-outline-primary" id="submit" type="submit" name="submit" value="Submit">
-
 </form>
-
-
 
 <script type="text/javascript" src="<?php echo ROOT_URL; ?>assets/JS/quiz.js"></script>
 <?php endif; ?>
