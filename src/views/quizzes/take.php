@@ -12,14 +12,20 @@
   // pass questions and quizData to javascript
   var questions = <?php echo $questions; ?>;
   var quizData = <?php echo $quizData; ?>;
+  var hrefQuizzes = "<?php echo ROOT_URL; ?>quizzes";
 
 </script>
+
 <form class="container mb-3" id="form">
-  <h1 id="question"></h1><hr><br>
-  <div id="choices">
+  <h1 class="display-4 mt-5" id="question"></h1><hr><br>
+  <div class="container mb-3" id="choices">
   </div>
-  <input class="btn btn-outline-primary" id="submit" type="submit" name="submit" value="Submit">
+  <button type="button" class="btn btn-outline-primary" name="button" id="submit">Submit</button>
+
 </form>
+
+<div class="container" id="result">
+</div>
 
 <script type="text/javascript" src="<?php echo ROOT_URL; ?>assets/JS/quiz.js"></script>
 <?php endif; ?>

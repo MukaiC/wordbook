@@ -22,7 +22,7 @@
   <div class="container mt-4">
 
     <?php if(!$viewmodel) : ?>
-      <p><?php echo 'No entries yet.<br> Add a new word or phrase!' ?></p>
+      <p><?php echo 'No entries yet.<br> Add new words or phrases!' ?></p>
     <?php else: ?>
       <?php foreach($viewmodel as $item) : ?>
         <div class="card card-body border-info mb-2 bg-light">

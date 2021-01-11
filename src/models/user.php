@@ -48,7 +48,7 @@ class UserModel extends Model{
         // Redirect
         if(isset($_SESSION['next'])){
           header('Location: '.ROOT_URL.$_SESSION['next']);
-          
+
         } else{
           header('Location: '.ROOT_URL.'words');
         }

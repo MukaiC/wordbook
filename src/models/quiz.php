@@ -43,19 +43,22 @@ class QuizModel extends Model{
         // First question of a new quiz
         // Insert user_id and title to table quizzes
         $this->query('INSERT INTO quizzes (user_id, title) VALUES (:user_id, :title)');
+
         // Get the loggedin user's id from $_SESSION[user_data] and bind it
         $this->bind(':user_id', $_SESSION['user_data']['id']);
+        // $this->bind(':user_id', 1);
         $this->bind(':title', $post['title']);
         $this->execute();
-        // Get the lastinserted id for this quiz
+
+        // Get lastinserted id for this quiz
         $quiz_id = $this->lastInsertId();
 
         // Insert question into MySQL
-        $this->query('INSERT INTO questions (content, quiz_id, user_id) VALUES (:content, :quiz_id, :user_id)');
+        $this->query('INSERT INTO questions (content, quiz_id) VALUES (:content, :quiz_id)');
         $this->bind(':content', $post['question']);
         $this->bind(':quiz_id', $quiz_id);
-        $this->bind(':user_id', $_SESSION['user_data']['id']);
         $this ->execute();
+
         // Get the lastinserted id for this questions's options
         $question_id = $this->lastInsertId();
 
@@ -89,10 +92,9 @@ class QuizModel extends Model{
         $quiz_title = $_SESSION['create_data']['title'];
         $quiz_id = $_SESSION['create_data']['quiz_id'];
         // Insert question with the same quiz_id
-        $this->query('INSERT INTO questions (content, quiz_id, user_id) VALUES (:content, :quiz_id, :user_id)');
+        $this->query('INSERT INTO questions (content, quiz_id) VALUES (:content, :quiz_id)');
         $this->bind(':content', $post['question']);
         $this->bind(':quiz_id', $quiz_id);
-        $this->bind(':user_id', $_SESSION['user_data']['id']);
         $this ->execute();
         // get the lastinserted id for this questions's options
         $question_id = $this->lastInsertId();
@@ -151,7 +153,7 @@ class QuizModel extends Model{
     // print_r($rows);
     // echo '</pre>';
     if(!$rows){
-       Messages::setMsg('No quizzes yet', 'error');
+       Messages::setMsg('No quiz yet', 'error');
     } else {
       return $rows;
     }
@@ -159,6 +161,7 @@ class QuizModel extends Model{
   }
 
   // This is to display a quizz with all questions at onece
+  // !!Query does not work (table altered)
   public function takeAll(){
       if(isset($_POST['submit'])){
         $post = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
@@ -194,7 +197,7 @@ class QuizModel extends Model{
           Messages::setMsg("You scored {$score} out of {$num_q}", 'success');
           return;
       } else {
-        // Retrieve the quiz from database
+        // !!! Need to modified, question.user_id does not exist amy more
         $this->query('SELECT questions.content, options.content, options.is_answer FROM questions JOIN users ON questions.user_id = users.id JOIN options ON options.question_id = questions.id WHERE users.id = :user_id');
         // Bind the user_id to the current user id
         $userId = $_SESSION['user_data']['id'];
