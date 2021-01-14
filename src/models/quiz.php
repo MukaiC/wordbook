@@ -4,8 +4,148 @@ class QuizModel extends Model{
     // Retrieve the title and the user's name of all quizzes to list on index page
     $this->query('SELECT quizzes.*, users.name FROM quizzes JOIN users ON quizzes.user_id = users.id ORDER BY created_at DESC');
     $rows = $this->resultSet();
+    // print_r($rows);
     return $rows;
+  }
+
+  public function manage(){
+    // echo 'QUIZZES/MANAGE PAGE';
+    // Retrieve all quizzes created by the logged in user
+    $this->query('SELECT quizzes.* FROM quizzes JOIN users ON quizzes.user_id = users.id WHERE users.id = :user_id ORDER BY created_at DESC');
+    $this->bind(':user_id', $_SESSION['user_data']['id']);
+    $rows = $this->resultSet();
+    // print_r($rows);
+    return $rows;
+  }
+
+  public function edit(){
+    // if(isset($_POST['submit'])){
+    if(isset($_POST['submit'])){
+      $post = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+      // !!!Validation
+
+      // Update Title
+      $this->query('UPDATE quizzes SET title = :title WHERE quizzes.id = :quiz_id');
+      $this->bind(':title', $post['title']);
+      $this->bind(':quiz_id', $post['quiz-id']);
+      $this->execute();
+
+      // Update questions
+      $num_questions = $post['num-questions'];
+      for($q = 1; $q <= $num_questions; $q++ ){
+        $this->query('UPDATE questions SET content = :question WHERE questions.id = :question_id');
+        $this->bind(':question', $post["question{$q}"]);
+        $this->bind(':question_id', $post["question{$q}-id"]);
+        $this->execute();
+
+        // Update answer options
+        for ($i = 1; $i < 5; $i++){
+          $this->query('UPDATE options SET is_answer = :is_answer, content = :option WHERE options.id = :option_id');
+          $this->bind(':option', $post["question{$q}option{$i}"]);
+          // 'correct1' means correct answer for question 1
+          if($post["correct{$q}"] == "option{$i}"){
+            $this->bind(':is_answer', true);
+          } else {
+            $this->bind(':is_answer', false);
+          }
+          $this->bind(':option_id', $post["question{$q}option{$i}-id"]);
+          $this->execute();
+        }
+      }
+
+      // echo '<pre>';
+      // print_r($_POST);
+      // echo '</pre>';
+      // Redirect to quizes manage page
+      header('Location: '.ROOT_URL.'quizzes/manage');
+
     }
+
+
+    // Request to edit a quiz
+    if(isset($_GET['quiz_id'])){
+      $quiz_id = intval($_GET['quiz_id']);
+      // Retrieve the quiz title
+      $this->query('SELECT * FROM quizzes WHERE quizzes.id = :quiz_id');
+      $this->bind(':quiz_id', $quiz_id);
+      $row = $this->single();
+      // echo $row['user_id'];
+      // echo $_SESSION['user_data']['id'];
+      // Make sure if the logged in user is the author of the quiz
+      if($row['user_id'] != $_SESSION['user_data']['id']){
+        // Logged in user is not the author
+        // Redirect to manage quiz page
+        header('Location: '.ROOT_URL.'quizzes/manage');
+      } else {
+        // Logged in user is the author of the quiz
+        // Retrieve the questions and options
+        // Quiz title
+        $title = $row['title'];
+        // $this->query('SELECT questions.* FROM quizzes JOIN questions ON questions.quiz_id = quizzes.id WHERE quizzes.id = :quiz_id');
+        // $rows = $this->resultSet();
+        $this->query('SELECT questions.id, questions.content, options.id, options.content, options.is_answer FROM quizzes JOIN questions ON questions.quiz_id = quizzes.id JOIN options ON options.question_id = questions.id WHERE quizzes.id = :quiz_id');
+        $this-> bind(':quiz_id', $quiz_id);
+
+        $rows = $this->resultSetGroup();
+        // echo '<pre>';
+        // print_r($rows);
+        // echo '</pre>';
+        //
+
+        // Count the number of questions
+        $num_questions = count($rows);
+
+
+        $quiz_data = array('title' => $title, 'quiz_id' => $quiz_id, 'questions' => $rows, 'num_questions' => $num_questions );
+        echo '<pre>';
+        print_r($quiz_data);
+        echo '</pre>';
+
+        return $quiz_data;
+
+
+        // $questions = array_keys($rows);
+        // // print_r($questions);
+        // // Quiz answer options
+        // $options = array_values($rows);
+        // // echo '<pre>';
+        // // print_r($options);
+        // // echo '</pre>';
+        // // Quiz data
+        // $quiz_data = array($title_id=>$title, $questions, $options);
+        // echo '<pre>';
+        // print_r($quiz_data);
+        // echo '</pre>';
+        // return $quiz_data;
+
+        // echo '<pre>';
+        // print_r($rows);
+        // echo '</pre>';
+        //
+      }
+
+      // print_r($row);
+
+      // $this->query('SELECT quizzes.*, questions.content, options.content, options.is_answer FROM quizzes JOIN users ON quizzes.user_id = users.id JOIN questions ON questions.quiz_id = quizzes.id JOIN options ON options.question_id = questions.id WHERE quizzes.id = :quiz_id');
+      // $this->bind(':quiz_id', $quiz_id);
+      // $rows = $this->resultSet();
+      // echo '<pre>';
+      // print_r($rows);
+      // echo '</pre>';
+    }
+
+
+
+
+  }
+
+  public function delete(){
+    // Request to delete a quiz
+    if(isset($_GET['id'])){
+      $quiz_id = intval($_GET['id']);
+      echo "delete quiz {$quiz_id}";
+    }
+  }
 
   public function create(){
     $post = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);

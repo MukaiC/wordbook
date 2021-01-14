@@ -1,6 +1,8 @@
 
 <div class="container mb-5">
-<h1 class="display-4">QUIZZES</h1><hr><br>
+  
+<h1 class="display-4">QUIZZES</h1><hr>
+
 <?php if($viewmodel): ?>
   <div class="container mb-3">
     <?php foreach($viewmodel as $item): ?>
@@ -13,6 +15,8 @@
 <?php endif; ?>
 
   <div class="container mb-3">
-      <a class="btn btn-sm btn-info" href="<?php echo ROOT_PATH; ?>quizzes/create">Create Quiz</a>
+      <a class="btn btn-sm btn-outline-info" href="<?php echo ROOT_PATH; ?>quizzes/create">Create Quiz</a>
+      <a class="btn btn-sm btn-outline-info" href="<?php echo ROOT_PATH; ?>quizzes/manage">Manage my Quizzes</a>
   </div>
+
 </div>
