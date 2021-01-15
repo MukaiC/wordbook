@@ -1,6 +1,6 @@
 
 <div class="container mb-5">
-  
+
 <h1 class="display-4">QUIZZES</h1><hr>
 
 <?php if($viewmodel): ?>
@@ -15,7 +15,7 @@
 <?php endif; ?>
 
   <div class="container mb-3">
-      <a class="btn btn-sm btn-outline-info" href="<?php echo ROOT_PATH; ?>quizzes/create">Create Quiz</a>
+      <a class="btn btn-sm btn-outline-info" href="<?php echo ROOT_PATH; ?>quizzes/create">Create Quizzes</a>
       <a class="btn btn-sm btn-outline-info" href="<?php echo ROOT_PATH; ?>quizzes/manage">Manage my Quizzes</a>
   </div>
 

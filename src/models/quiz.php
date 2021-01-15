@@ -22,7 +22,37 @@ class QuizModel extends Model{
     // if(isset($_POST['submit'])){
     if(isset($_POST['submit'])){
       $post = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
-      // !!!Validation
+      // echo '<pre>';
+      // print_r($post);
+      // echo '</pre>';
+
+      // !!!Validation-form dissapears when merror message is shown
+      // Make sure all fields are filled
+
+      foreach($post as $key => $value){
+        if($value == ''){
+          Messages::setMsg('Please Fill In All Fields', 'error');
+          return;
+        }
+      }
+
+      // if($post['title'] ==''){
+      //   Messages::setMsg('Please Fill In Title', 'error');
+      //   return;
+      // }
+      //
+      // for($q = 1; $q <= $post['num-questions']; $q++){
+      //   if($post["question{$q}"] == ''){
+      //     Messages::setMsg('Please Fill In All Questions', 'error');
+      //     return;
+      //   }
+      //   for($i = 1; $i < 5; $i++){
+      //     if($post["question{$q}option{$i}"] == ''){
+      //       Messages::setMsg('Please Fill In All Answer Options', 'error');
+      //   }
+      //   return;
+      //   }
+      // }
 
       // Update Title
       $this->query('UPDATE quizzes SET title = :title WHERE quizzes.id = :quiz_id');
@@ -53,14 +83,11 @@ class QuizModel extends Model{
         }
       }
 
-      // echo '<pre>';
-      // print_r($_POST);
-      // echo '</pre>';
+
+
       // Redirect to quizes manage page
       header('Location: '.ROOT_URL.'quizzes/manage');
-
     }
-
 
     // Request to edit a quiz
     if(isset($_GET['quiz_id'])){
@@ -81,69 +108,48 @@ class QuizModel extends Model{
         // Retrieve the questions and options
         // Quiz title
         $title = $row['title'];
-        // $this->query('SELECT questions.* FROM quizzes JOIN questions ON questions.quiz_id = quizzes.id WHERE quizzes.id = :quiz_id');
-        // $rows = $this->resultSet();
+
         $this->query('SELECT questions.id, questions.content, options.id, options.content, options.is_answer FROM quizzes JOIN questions ON questions.quiz_id = quizzes.id JOIN options ON options.question_id = questions.id WHERE quizzes.id = :quiz_id');
         $this-> bind(':quiz_id', $quiz_id);
 
         $rows = $this->resultSetGroup();
-        // echo '<pre>';
-        // print_r($rows);
-        // echo '</pre>';
-        //
+
 
         // Count the number of questions
         $num_questions = count($rows);
 
-
         $quiz_data = array('title' => $title, 'quiz_id' => $quiz_id, 'questions' => $rows, 'num_questions' => $num_questions );
-        echo '<pre>';
-        print_r($quiz_data);
-        echo '</pre>';
-
-        return $quiz_data;
-
-
-        // $questions = array_keys($rows);
-        // // print_r($questions);
-        // // Quiz answer options
-        // $options = array_values($rows);
-        // // echo '<pre>';
-        // // print_r($options);
-        // // echo '</pre>';
-        // // Quiz data
-        // $quiz_data = array($title_id=>$title, $questions, $options);
         // echo '<pre>';
         // print_r($quiz_data);
         // echo '</pre>';
-        // return $quiz_data;
-
-        // echo '<pre>';
-        // print_r($rows);
-        // echo '</pre>';
-        //
+        return $quiz_data;
       }
-
-      // print_r($row);
-
-      // $this->query('SELECT quizzes.*, questions.content, options.content, options.is_answer FROM quizzes JOIN users ON quizzes.user_id = users.id JOIN questions ON questions.quiz_id = quizzes.id JOIN options ON options.question_id = questions.id WHERE quizzes.id = :quiz_id');
-      // $this->bind(':quiz_id', $quiz_id);
-      // $rows = $this->resultSet();
-      // echo '<pre>';
-      // print_r($rows);
-      // echo '</pre>';
     }
-
-
-
-
+    return;
   }
 
   public function delete(){
+    if(isset($_POST['submit'])){
+      $post = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+      // print_r ($post);
+      $quiz_id = $post['quiz_id'];
+      $this->query('DELETE FROM quizzes WHERE id = :quiz_id');
+      $this->bind(':quiz_id', $quiz_id);
+      $this->execute();
+
+      header('Location: '.ROOT_URL.'quizzes/manage');
+      exit;
+    }
+
     // Request to delete a quiz
-    if(isset($_GET['id'])){
+    if(isset($_GET['id']) && !isset($_POST['submit'])){
       $quiz_id = intval($_GET['id']);
-      echo "delete quiz {$quiz_id}";
+      // Retrieve the quiz title
+      $this->query('SELECT * FROM quizzes WHERE quizzes.id = :quiz_id');
+      $this->bind(':quiz_id', $quiz_id);
+      $row = $this->single();
+      print_r($row);
+      return $row;
     }
   }
 
@@ -170,7 +176,7 @@ class QuizModel extends Model{
     // Form is submitted
     if(isset($post['submit']) || isset($post['submit-last'])){
       // Make sure all fields are filled
-      if($post['question'] == '' || $post['option1'] == '' || $post['option2'] =='' || $post['option3'] == '' || $post['option4'] ==''){
+      if($post['title'] == '' || $post['question'] == '' || $post['option1'] == '' || $post['option2'] =='' || $post['option3'] == '' || $post['option4'] ==''){
         Messages::setMsg('Please Fill In all Fields', 'error');
         return;
       } elseif(empty($post['correct'])){

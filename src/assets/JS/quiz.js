@@ -69,6 +69,8 @@ function alert_result(alertMessage, correctAnswer, numQuestion, numCorrect){
       display_question(numQuestion);
     }
   } else {
+    // !!!
+    nextButton.innerHTML = 'Result';
     // Click on next button sill show the final reult
     nextButton.onclick = function() {
       end_result(numCorrect, numQuestion);

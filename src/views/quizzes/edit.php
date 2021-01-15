@@ -5,23 +5,20 @@
 <h1 class="display-4">Edit Quiz: <?php echo $viewmodel['title']; ?></h1>
 
 <div class="container mt-3 mb-5">
-
-  <form class="" action="<?php $_SERVER['PHP_SELF']; ?>" method="post">
-    <input type="hidden" name="num-questions" value="<?php echo $viewmodel['num_questions']; ?>">
-    <!-- Title -->
-    <div class="form-group">
-      <label><strong>Title:</strong></label>
-        <input type="text" name="title" class="form-control" value="<?php echo $viewmodel['title'] ?? ''; ?>">
-        <input type="hidden" name="quiz-id" value="<?php echo $viewmodel['quiz_id']; ?>">
-    </div>
-
+<form class="" action="<?php $_SERVER['PHP_SELF']; ?>" method="post">
+  <input type="hidden" name="num-questions" value="<?php echo $viewmodel['num_questions']; ?>">
+  <!-- Title -->
+  <div class="form-group">
+    <label><strong>Title:</strong></label>
+      <input type="text" name="title" id="title" class="form-control" value="<?php echo $viewmodel['title'] ?? ''; ?>">
+      <input type="hidden" name="quiz-id" value="<?php echo $viewmodel['quiz_id']; ?>">
+  </div>
 </div>
 
 <!-- Questions -->
 <div class="container mb-3">
   <?php $questions = $viewmodel['questions'] ?>
 
-<!-- Foreach -->
   <?php $q=1; ?>
   <?php foreach ($questions as $key => $value): ?>
     <div class="form-group">
@@ -29,7 +26,7 @@
         <input type="hidden" name="question<?php echo $q; ?>-id" value="<?php echo $key; ?>">
         <input type="text" name="question<?php echo $q; ?>" class="form-control" value="<?php echo $value[0]['0'] ?? ''; ?>">
     </div>
-
+<!-- Answer options -->
     <?php $a=1; ?>
     <div class="container form-group">
       <?php foreach($value as $item): ?>
@@ -45,14 +42,13 @@
     <?php $q++; ?>
     <?php endforeach; ?>
 
-<!-- endforeach -->
-
-</div>
-<br>
-<!-- Buttons  -->
-    <input class="btn btn-outline-primary" type="submit" name="submit" value="Edit">
-    <a class="btn btn-sm btn-outline-danger" href="<?php echo ROOT_URL; ?>quizzes">Cancel</a>
+    <input class="btn btn-outline-primary" type="submit" name="submit" value="Edit" id="submit">
+    <a class="btn btn-sm btn-outline-danger" href="<?php echo ROOT_URL; ?>quizzes/manage">Cancel</a>
+  </div>
 </form>
+
+
+
 <?php endif; ?>
 
 </div>
