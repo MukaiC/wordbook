@@ -1,8 +1,7 @@
 <div class="container mb-5">
 
-
 <?php if($viewmodel): ?>
-<h1 class="display-4">Edit Quiz: <?php echo $viewmodel['title']; ?></h1>
+<h1 class="display-4">Edit Quiz</h1><br>
 
 <div class="container mt-3 mb-5">
 <form class="" action="<?php $_SERVER['PHP_SELF']; ?>" method="post">

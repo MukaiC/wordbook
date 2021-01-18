@@ -149,7 +149,7 @@ function end_result(numCorrect, numQuestion){
   document.querySelector('#result').append(result);
   // Link back to quizzes
   let back = document.createElement('a');
-  back.className = 'btn btn-outline-info';
+  back.className = 'btn btn-outline-info mr-1';
   back.href = hrefQuizzes;
   back.innerHTML = 'Take another quiz';
   document.querySelector('#result').append(back);

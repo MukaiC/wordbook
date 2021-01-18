@@ -26,9 +26,8 @@ class QuizModel extends Model{
       // print_r($post);
       // echo '</pre>';
 
-      // !!!Validation-form dissapears when merror message is shown
+      // !!!Validation-form dissapears when error message is shown
       // Make sure all fields are filled
-
       foreach($post as $key => $value){
         if($value == ''){
           Messages::setMsg('Please Fill In All Fields', 'error');
@@ -90,8 +89,9 @@ class QuizModel extends Model{
     }
 
     // Request to edit a quiz
-    if(isset($_GET['quiz_id'])){
-      $quiz_id = intval($_GET['quiz_id']);
+    $get = filter_input_array(INPUT_GET, FILTER_SANITIZE_STRING);
+    if(isset($get['quiz_id'])){
+      $quiz_id = intval($get['quiz_id']);
       // Retrieve the quiz title
       $this->query('SELECT * FROM quizzes WHERE quizzes.id = :quiz_id');
       $this->bind(':quiz_id', $quiz_id);
@@ -142,13 +142,13 @@ class QuizModel extends Model{
     }
 
     // Request to delete a quiz
-    if(isset($_GET['id']) && !isset($_POST['submit'])){
-      $quiz_id = intval($_GET['id']);
+    $get = filter_input_array(INPUT_GET, FILTER_SANITIZE_STRING);
+    if(isset($get['id']) && !isset($_POST['submit'])){
+      $quiz_id = intval($get['id']);
       // Retrieve the quiz title
       $this->query('SELECT * FROM quizzes WHERE quizzes.id = :quiz_id');
       $this->bind(':quiz_id', $quiz_id);
       $row = $this->single();
-      print_r($row);
       return $row;
     }
   }
@@ -283,8 +283,9 @@ class QuizModel extends Model{
   public function take(){
     /*This is for a quizz page where questions are displayed one at a time*/
     // Id of the selected quiz
-    if(isset($_GET['id'])){
-      $quiz_id = intval($_GET['id']);
+    $get = filter_input_array(INPUT_GET, FILTER_SANITIZE_STRING);
+    if(isset($get['id'])){
+      $quiz_id = intval($get['id']);
       // echo $quiz_id;
     } else {
       Messages::setMsg('Quiz not found', 'error');

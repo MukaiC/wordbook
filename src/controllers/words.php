@@ -13,15 +13,21 @@ class Words extends Controller{
     $viewmodel = new WordModel();
     $this->returnView($viewmodel->add(), true);
   }
-  //
-  // protected function search(){
-  //   $viewmodel = new WordModel();
-  //   $this->returnView($viewmodel->index(), true);
-  // }
-  //
-  // protected function results(){
-  //   // echo 'WORDS/RESULTS';
-  //   $viewmodel = new WordModel();
-  //   $this->returnView($viewmodel->results(), true);
-  // }
+
+  protected function edit(){
+    if(!isset($_SESSION['is_logged_in'])){
+      header('Location: '.ROOT_URL.'users/login');
+    }
+    $viewmodel = new WordModel();
+    $this->returnView($viewmodel->edit(), true);
+  }
+
+  protected function delete(){
+    if(!isset($_SESSION['is_logged_in'])){
+      header('Location: '.ROOT_URL.'users/login');
+    }
+    $viewmodel = new WordModel();
+    $this->returnView($viewmodel->delete(), true);
+  }
+
 }

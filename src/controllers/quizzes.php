@@ -5,7 +5,6 @@ class Quizzes extends Controller{
     $viewmodel = new QuizModel();
     // Quizzes index page rendered through main.php
     $this->returnView($viewmodel->Index(), true);
-    // $this->returnView($viewmodel->Index(), false);
   }
 
   protected function manage(){

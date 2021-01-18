@@ -8,6 +8,6 @@
 
   <div class="container">
     <p class="lead">Test your knowledge? Or test others!</p>
-    <a class="btn btn-outline-info" href="<?php echo ROOT_PATH; ?>quizzes">Go to quiz</a>
+    <a class="btn btn-outline-info" href="<?php echo ROOT_PATH; ?>quizzes">Go to Quizzes</a>
   </div>
 </div>
