@@ -1,6 +1,6 @@
 # WordBook & Quizzes
 
-A web application where users can save newly learned words and phrases. Users can also create multiple choice quizzes and share them with fellow users.
+A web application where users can save words and phrases. Users can also create multiple choice quizzes and share them with other users.
 
 
 ## Features
@@ -11,5 +11,3 @@ A web application where users can save newly learned words and phrases. Users ca
 
 
 ## Requirements
-* 
-*
