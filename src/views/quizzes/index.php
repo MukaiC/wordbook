@@ -12,6 +12,8 @@
         </div>
     <?php endforeach; ?>
   </div><br>
+<?php else: ?>
+  <p>No quiz yet. Be the first to create one!</p>
 <?php endif; ?>
 
   <div class="container mb-3">
